@@ -25,13 +25,14 @@ function initMap() {
   // ── 2. Kacheln einbinden (CartoDB Dark Matter = dunkles OSM)
   //    Entspricht tiles='CartoDB positron' aus den Folien (Folie 107),
   //    hier die dunkle Variante für Ocean-Thema
-  L.tileLayer(
-  'https://tile.openstreetmap.de/{z}/{x}/{y}.png',
-  {
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 10,
-  }
-).addTo(map);
+   L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | © <a href="https://carto.com/">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 10,
+    }
+  ).addTo(map);
 
   // ── 3. Daten auf Karte zeichnen ──
   _addGarbagePatches();
