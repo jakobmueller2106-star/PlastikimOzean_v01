@@ -1,30 +1,19 @@
 // ═══════════════════════════════════════════════════════
 // map.js – Leaflet-Karte initialisieren und befüllen
-//
-// ENTSPRICHT DEN FOLIEN:
-//   - Folie 107–109 INME: folium.Map(...), folium.CircleMarker,
-//     folium.Marker mit Popup → hier 1:1 in Leaflet.js übersetzt
-//   - Folie 195 DV: Punkt- vs. Choroplethenkarte → Punktmarker
-//   - Folie 200 DV: Interaktive HTML-Karte mit Klick-Popup
 // ═══════════════════════════════════════════════════════
 
-let map;           // Globale Leaflet-Map-Instanz
-let particleSystem; // Globale Partikelinstanz
+let map;
+let particleSystem;
 
 function initMap() {
-  // ── 1. Karte erstellen (wie folium.Map in den Folien) ──
   map = L.map('map', {
     center: [15, 0],
     zoom: 2,
     zoomControl: true,
     attributionControl: true,
-    // Scrollen auf der Karte nicht mit Seiten-Scroll mixen
     scrollWheelZoom: false,
   });
 
-  // ── 2. Kacheln einbinden (CartoDB Dark Matter = dunkles OSM)
-  //    Entspricht tiles='CartoDB positron' aus den Folien (Folie 107),
-  //    hier die dunkle Variante für Ocean-Thema
   L.tileLayer(
     'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
     {
@@ -34,44 +23,44 @@ function initMap() {
     }
   ).addTo(map);
 
-  // ── 3. Daten auf Karte zeichnen ──
   _addGarbagePatches();
   _addPlasticSources();
   _addCurrentArrows();
 
-  // ── 4. Partikelanimation starten ──
   particleSystem = new ParticleSystem(map);
   particleSystem.start();
 }
 
-// ── MÜLLSTRUDEL als Kreise (wie folium.CircleMarker in Folie 108) ──
+// ── MÜLLSTRUDEL als circleMarker (fixer Pixel-Radius, kein Flackern beim Zoom) ──
 function _addGarbagePatches() {
   for (const patch of GARBAGE_PATCHES) {
-    // Äußerer Glüh-Kreis
-    L.circle([patch.lat, patch.lng], {
-      radius: patch.radius * 15000,
+
+    // Äußerer Glüh-Ring – auch als circleMarker
+    L.circleMarker([patch.lat, patch.lng], {
+      radius:      patch.radius * 0.85,
       color:       '#ff3b6b',
       fillColor:   '#ff3b6b',
-      fillOpacity: 0.07,
-      weight:      1.5,
-      opacity:     0.4,
+      fillOpacity: 0.06,
+      weight:      1,
+      opacity:     0.35,
+      interactive: false,
       className:   'patch-outer',
     }).addTo(map);
 
-    // Innerer Kern-Kreis mit Popup (wie folium.Popup in Folie 108)
-    const circle = L.circle([patch.lat, patch.lng], {
-      radius:      patch.radius * 5000,
+    // Kern-Punkt – fester Pixel-Radius, immer sichtbar
+    const marker = L.circleMarker([patch.lat, patch.lng], {
+      radius:      patch.radius * 0.38,
       color:       '#ff3b6b',
       fillColor:   '#ff3b6b',
-      fillOpacity: 0.5,
+      fillOpacity: 0.55,
       weight:      2,
+      className:   'patch-core',
     }).addTo(map);
 
-    // Popup-Inhalt bauen (wie in Folie 109 beschrieben)
-    const sizeFormatted = patch.size_km2.toLocaleString('de-DE');
+    const sizeFormatted   = patch.size_km2.toLocaleString('de-DE');
     const weightFormatted = patch.weight_tons.toLocaleString('de-DE');
 
-    circle.bindPopup(`
+    marker.bindPopup(`
       <div class="popup-inner">
         <h3>${patch.name}</h3>
         <span class="popup-badge popup-badge--patch">Garbage Patch</span>
@@ -93,13 +82,9 @@ function _addGarbagePatches() {
           <span class="popup-stat-value" style="font-size:0.72rem">${patch.source}</span>
         </div>
       </div>
-    `, {
-      maxWidth: 280,
-      className: 'custom-popup',
-    });
+    `, { maxWidth: 280, className: 'custom-popup' });
 
-    // Hover-Effekt: Tooltip
-    circle.bindTooltip(patch.name, {
+    marker.bindTooltip(patch.name, {
       permanent: false,
       direction: 'top',
       className: 'patch-tooltip',
@@ -108,9 +93,8 @@ function _addGarbagePatches() {
   }
 }
 
-// ── QUELLEN als Marker (wie folium.Marker in Folie 108/109) ──
+// ── QUELLEN als Marker ──
 function _addPlasticSources() {
-  // Eigenes Dreieck-Icon für Quellen
   const sourceIcon = L.divIcon({
     html: `<div style="
       width:12px; height:12px;
@@ -148,36 +132,30 @@ function _addPlasticSources() {
   }
 }
 
-// ── STRÖMUNGSPFEILE als Polylinien ──
+// ── STRÖMUNGSPFEILE ──
 function _addCurrentArrows() {
   for (const current of CURRENTS) {
-    // Linie der Strömung
-    const line = L.polyline(
+    L.polyline(
       [current.from, current.to],
       {
-        color:   `rgba(0, 212, 255, ${0.2 * current.strength})`,
-        weight:  1.5 * current.strength,
-        opacity: 0.6,
+        color:     `rgba(0, 212, 255, ${0.2 * current.strength})`,
+        weight:    1.5 * current.strength,
+        opacity:   0.6,
         dashArray: '6, 8',
       }
     ).addTo(map);
 
-    // Kleinen Pfeil am Ende der Linie
-    _addArrowHead(current.to, current.from, current.to);
+    _addArrowHead(current.to, current.from);
   }
 }
 
-// Pfeilspitze zeichnen
-function _addArrowHead(tipLatLng, fromLatLng, toLatLng) {
+function _addArrowHead(tipLatLng, fromLatLng) {
   const tip  = L.latLng(tipLatLng);
   const from = L.latLng(fromLatLng);
-
-  // Winkel berechnen
-  const dx = tip.lng - from.lng;
-  const dy = tip.lat - from.lat;
+  const dx   = tip.lng - from.lng;
+  const dy   = tip.lat - from.lat;
   const angle = Math.atan2(dy, dx) * (180 / Math.PI);
 
-  // Kleinen Dreiecks-Marker als Pfeilkopf
   const arrowIcon = L.divIcon({
     html: `<div style="
       width: 0; height: 0;
@@ -195,8 +173,7 @@ function _addArrowHead(tipLatLng, fromLatLng, toLatLng) {
   L.marker(tip, { icon: arrowIcon, interactive: false }).addTo(map);
 }
 
-// ── KARTENANSICHT WECHSELN (für Scrollytelling) ──
-// Wird von scroll.js aufgerufen, wenn ein neuer Schritt aktiv wird
+// ── KARTENANSICHT WECHSELN ──
 function flyToStep(step) {
   const view = MAP_VIEWS[step];
   if (!view || !map) return;
