@@ -170,8 +170,8 @@ const CURRENTS = [
 // Nutzer die jeweilige Story-Karte sieht.
 const MAP_VIEWS = {
   1: { lat: 20,  lng: 0,    zoom: 2,   label: 'Quellen weltweit' },
-  2: { lat: 25,  lng: -160, zoom: 3,   label: 'Nordpazifik-Gyre' },
-  3: { lat: 10,  lng: -60,  zoom: 2.5, label: 'Alle fünf Strudel' },
-  4: { lat: 32,  lng: -145, zoom: 4,   label: 'Great Pacific Garbage Patch' },
+  2: { lat: 25,  lng: -160, zoom: 3.5, label: 'Nordpazifik-Gyre' },
+  3: { lat: -32, lng: -130, zoom: 3.5, label: 'Südpazifik Garbage Patch' },
+  4: { lat: -25, lng: 80,   zoom: 3.5, label: 'Indischer Ozean Garbage Patch' },
   5: { lat: 10,  lng: 0,    zoom: 2,   label: 'Globale Übersicht' },
 };
