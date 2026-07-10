@@ -11,9 +11,9 @@
   --c-border:      rgba(255,255,255,0.08);
   --c-text:        #d6e8f5;
   --c-text-muted:  #6b8faa;
-  --c-accent:      #00d4ff;      /* Biolumineszenz-Cyan */
-  --c-warn:        #ff6b35;      /* Plastik-Orange */
-  --c-patch:       #ff3b6b;      /* Müllstrudel-Rot */
+  --c-accent:      #00d4ff;
+  --c-warn:        #ff6b35;
+  --c-patch:       #ff3b6b;
   --c-current:     rgba(0,212,255,0.6);
 
   --font-display:  'Fraunces', Georgia, serif;
@@ -58,7 +58,6 @@ body {
   background: radial-gradient(ellipse at 30% 60%, #0a2545 0%, #060d1a 70%);
 }
 
-/* animiertes Gitter im Hintergrund (reine CSS-Animation) */
 .hero__bg-canvas::after {
   content: '';
   position: absolute;
@@ -171,7 +170,6 @@ body {
   align-items: flex-start;
 }
 
-/* Linke Seite: Karte klebt beim Scrollen */
 .story__sticky-map {
   position: sticky;
   top: 0;
@@ -186,8 +184,8 @@ body {
   background: var(--c-surface);
 }
 
-/* Leaflet-Kacheln dunkel einfärben */
-.leaflet-tile-pane { filter: brightness(0.4) saturate(0.5) hue-rotate(200deg); }
+/* Leaflet-Kacheln: Meer sehr dunkel, Land deutlich heller → höherer Kontrast */
+.leaflet-tile-pane { filter: brightness(0.28) saturate(0.3) hue-rotate(195deg) contrast(1.35); }
 
 .map__legend {
   position: absolute;
@@ -217,7 +215,6 @@ body {
 .legend-dot--source  { background: var(--c-warn); }
 .legend-dot--current { background: var(--c-accent); }
 
-/* Rechte Seite: Text-Schritte */
 .story__steps {
   width: 40%;
   padding: 0 0 30vh 0;
@@ -569,7 +566,6 @@ body {
   }
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
