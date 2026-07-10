@@ -16,9 +16,9 @@
   --c-patch:       #ff3b6b;
   --c-current:     rgba(0,212,255,0.6);
 
-  --font-display:  'Fraunces', Georgia, serif;
-  --font-body:     'Space Grotesk', system-ui, sans-serif;
-
+ --font-display:  'Bebas Neue', 'Arial Narrow', sans-serif;
+  --font-body:     'Inter', system-ui, sans-serif;
+   
   --radius:        6px;
   --transition:    0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
